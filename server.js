@@ -15,6 +15,7 @@ var corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors());
 
+
 // parse requests of content-type - application/json
 app.use(express.json());
 
@@ -23,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the Travel backend." });
+  res.json({ message: "Welcome to the courier backend." });
 });
 
 // Routes
