@@ -1,6 +1,9 @@
-# Recipe Backend with Node
+Courier Delivery System
+This application is a Courier Delivery System that allows users to manage and track deliveries. Please follow the instructions below to set up the application.
 
-This application allows users to create and maintain a list of recipes that have steps and ingredients. Please visit https://github.com/OC-ComputerScience/recipe-frontend for the Vue 3 frontend repository.
+Prerequisites
+Node.js and npm should be installed on your machine.
+MySQL database should be set up and running.
 
 #### Please note:
 
@@ -11,7 +14,7 @@ This application allows users to create and maintain a list of recipes that have
 1. Clone the project into your **XAMPP/xamppfiles/htdocs** directory.
 
 ```
-git clone https://github.com/OC-ComputerScience/recipe-backend.git
+git clone [https://github.com/OC-ComputerScience/recipe-backend.git
 ```
 
 2. Install the project.
@@ -42,7 +45,7 @@ npm install
    - Save the file.
    - **Restart Apache** and exit XAMPP.
 
-4. Make a local **recipe_db** database.
+4. Make a local **Courier_db** database.
 
    - Create a schema/database.
    - The Sequelize in this project will make all the tables for you.
