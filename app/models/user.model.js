@@ -22,6 +22,11 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BLOB,
       allowNull: false,
     },
+    permissions: {
+      type: Sequelize.ENUM("user", "courier", "admin"),
+      allowNull: false,
+      defaultValue: "admin", // Set the default value to "admin"
+    },
   });
 
   return User;

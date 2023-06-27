@@ -35,8 +35,6 @@ exports.create = async (req, res) => {
       if (data) {
         return "This email is already in use.";
       } else {
-        console.log("email not found");
-
         let salt = await getSalt();
         let hash = await hashPassword(req.body.password, salt);
 
@@ -142,9 +140,6 @@ exports.findByEmail = (req, res) => {
         res.send(data);
       } else {
         res.send({ email: "not found" });
-        /*res.status(404).send({
-          message: `Cannot find User with email=${email}.`
-        });*/
       }
     })
     .catch((err) => {
@@ -158,24 +153,22 @@ exports.findByEmail = (req, res) => {
 exports.update = (req, res) => {
   const id = req.params.id;
 
-  User.update(req.body, {
-    where: { id: id },
-  })
-    .then((number) => {
-      if (number == 1) {
-        res.send({
-          message: "User was updated successfully.",
-        });
+  User.update(req.body, { where: { id: id } })
+    .then((result) => {
+      if (result[0] === 1) {
+        User.findByPk(id)
+          .then((data) => {
+            res.send(data);
+          })
+          .catch((err) => {
+            res.status(500).send({ message: err.message || "Error retrieving updated User data." });
+          });
       } else {
-        res.send({
-          message: `Cannot update User with id = ${id}. Maybe User was not found or req.body is empty!`,
-        });
+        res.send({ message: `Cannot update User with id = ${id}. Maybe User was not found or req.body is empty!` });
       }
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Error updating User with id =" + id,
-      });
+      res.status(500).send({ message: err.message || "Error updating User with id =" + id });
     });
 };
 
@@ -204,19 +197,18 @@ exports.delete = (req, res) => {
     });
 };
 
-// Delete all People from the database.
+// Delete all Users from the database.
 exports.deleteAll = (req, res) => {
   User.destroy({
     where: {},
     truncate: false,
   })
     .then((number) => {
-      res.send({ message: `${number} People were deleted successfully!` });
+      res.send({ message: `${number} Users were deleted successfully!` });
     })
     .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all people.",
+        message: err.message || "Some error occurred while removing all Users.",
       });
     });
 };
