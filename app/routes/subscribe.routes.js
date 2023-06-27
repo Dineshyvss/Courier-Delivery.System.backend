@@ -15,5 +15,5 @@ router.get("/subscribe/:id", SubscribeController.findById);
 module.exports = router;
 
 
-  app.use("/travelapi", router);
+  app.use("/courierapi", router);
 };

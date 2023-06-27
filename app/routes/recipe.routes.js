@@ -14,7 +14,7 @@ module.exports = (app) => {
   );
 
   // Retrieve all published Recipes
-  router.get("/recipes/", Recipe.findAllPublished);
+  router.get("/courier/", Recipe.findAllPublished);
 
   // Retrieve a single Recipe with id
   router.get("/recipes/:id", Recipe.findOne);
@@ -28,5 +28,5 @@ module.exports = (app) => {
   // Delete all Recipes
   router.delete("/recipes/", [authenticateRoute], Recipe.deleteAll);
 
-  app.use("/travelapi", router);
+  app.use("/courierapi", router);
 };
