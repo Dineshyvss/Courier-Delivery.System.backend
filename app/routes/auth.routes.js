@@ -7,8 +7,8 @@ module.exports = (app) => {
 
   // Login
   router.post("/login", auth.login);
-
-  // Logout
+   
+  // Log
   router.post("/logout", auth.logout);
 
   app.use("/courierapi", router);
