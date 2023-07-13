@@ -1,38 +1,39 @@
-const { saltSize, keySize } = require("../authentication/crypto");
-
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("user", {
+  const DeliveryRequest = sequelize.define("delivery_request", {
     id:{
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    firstName: {
+    pickup_address: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    lastName: {
+    delivery_address: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    email: {
+    delivery_date_time: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    password: {
-      type: Sequelize.BLOB,
+    delivery_status: {
+      type: Sequelize.STRING,
       allowNull: false,
     },
-    salt: {
-      type: Sequelize.BLOB,
+    price: {
+      type: Sequelize.STRING,
       allowNull: false,
     },
-    permissions: {
-      type: Sequelize.ENUM("user", "courier", "admin"),
+    average_time: {
+      type: Sequelize.STRING,
       allowNull: false,
-      defaultValue: "admin", // Set the default value to "admin"
+    },
+    distance: {
+      type: Sequelize.STRING,
+      allowNull: false,
     },
   });
 
-  return User;
+  return DeliveryRequest;
 };

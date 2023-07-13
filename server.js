@@ -9,7 +9,7 @@ const db = require("./app/models");
 db.sequelize.sync();
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "*",
 };
 
 app.use(cors(corsOptions));
@@ -29,12 +29,12 @@ app.get("/", (req, res) => {
 
 // Routes
 require("./app/routes/auth.routes")(app);
-require("./app/routes/ingredient.routes")(app);
-require("./app/routes/recipe.routes")(app);
-require("./app/routes/recipeStep.routes")(app);
-require("./app/routes/recipeIngredient.routes")(app);
+require("./app/routes/company.routes")(app);
+require("./app/routes/courier.routes")(app);
+require("./app/routes/customer.routes")(app);
+require("./app/routes/delivery_request.routes")(app);
+require("./app/routes/role.routes")(app);
 require("./app/routes/user.routes")(app);
-require("./app/routes/subscribe.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3201;
