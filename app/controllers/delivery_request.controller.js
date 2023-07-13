@@ -13,8 +13,8 @@ exports.create = (req, res) => {
     const error = new Error("delivery_address cannot be empty for delivery_request!");
     error.statusCode = 400;
     throw error;
-  } else if (req.body.delivery_date_time === undefined) {
-    const error = new Error("delivery_date_time cannot be empty for delivery_request!");
+  } else if (req.body.pickup_date_time === undefined) {
+    const error = new Error("pickup_date_time cannot be empty for delivery_request!");
     error.statusCode = 400;
     throw error;
   } else if (req.body.price === undefined) {

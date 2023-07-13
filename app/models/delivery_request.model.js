@@ -13,9 +13,13 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    delivery_date_time: {
+    pickup_date_time: {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: true,
+    },
+    delivered_date_time: {
+      type: Sequelize.STRING,
+      allowNull: true,
     },
     delivery_status: {
       type: Sequelize.STRING,
