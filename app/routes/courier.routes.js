@@ -1,32 +1,25 @@
 module.exports = (app) => {
-  const Recipe = require("../controllers/recipe.controller.js");
+  const Courier = require("../controllers/courier.controller.js");
   const { authenticateRoute } = require("../authentication/authentication");
   var router = require("express").Router();
 
-  // Create a new Recipe
-  router.post("/recipes/", [authenticateRoute], Recipe.create);
+  // Create a new Courier
+  router.post("/couriers/",  Courier.create);
 
-  // Retrieve all Recipes for user
-  router.get(
-    "/recipes/user/:userId",
-    [authenticateRoute],
-    Recipe.findAllForUser
-  );
+  // Retrieve all couriers
+  router.get("/courier/", Courier.findAll);
 
-  // Retrieve all published Recipes
-  router.get("/courier/", Recipe.findAllPublished);
+  // Retrieve a single Courier with id
+  router.get("/couriers/:id", Courier.findOne);
 
-  // Retrieve a single Recipe with id
-  router.get("/recipes/:id", Recipe.findOne);
+  // Update a Courier with id
+  router.put("/couriers/:id", Courier.update);
 
-  // Update a Recipe with id
-  router.put("/recipes/:id", [authenticateRoute], Recipe.update);
+  // Delete a Courier with id
+  router.delete("/couriers/:id",Courier.delete);
 
-  // Delete a Recipe with id
-  router.delete("/recipes/:id", [authenticateRoute], Recipe.delete);
+  // Delete all couriers
+  router.delete("/couriers/", Courier.deleteAll);
 
-  // Delete all Recipes
-  router.delete("/recipes/", [authenticateRoute], Recipe.deleteAll);
-
-  app.use("/courierapi", router);
+  app.use(router);
 };

@@ -1,56 +1,24 @@
 module.exports = (app) => {
-  const RecipeIngredient = require("../controllers/recipeIngredient.controller.js");
+  const Customer = require("../controllers/customer.controller.js");
   var router = require("express").Router();
-  const { authenticateRoute } = require("../authentication/authentication");
 
-  // Create a new Recipe Ingredient for a Recipe
-  router.post(
-    "/recipes/:recipeId/recipeIngredients/",
-    [authenticateRoute],
-    RecipeIngredient.create
-  );
+  // Create a new Customer
+  router.post("/customers/",  Customer.create);
 
-  // Retrieve all Recipe Ingredients
-  router.get("/recipeIngredients/", RecipeIngredient.findAll);
+  // Retrieve all customers
+  router.get("/customers/", Customer.findAll);
 
-  // Retrieve all Recipe Ingredients for a Recipe
-  router.get(
-    "/recipes/:recipeId/recipeIngredients/",
-    RecipeIngredient.findAllForRecipe
-  );
+  // Retrieve a single Customer with id
+  router.get("/customers/:id", Customer.findOne);
 
-  // Retrieve all Recipe Ingredients for a Recipe Step and include the ingredients
-  router.get(
-    "/recipes/:recipeId/recipeSteps/:recipeStepId/recipeIngredientsWithIngredients/",
-    RecipeIngredient.findAllForRecipeStepWithIngredients
-  );
+  // Update a Customer with id
+  router.put("/customers/:id", Customer.update);
 
-  // Retrieve a single Recipe Ingredient with id
-  router.get(
-    "/recipes/:recipeId/recipeIngredients/:id",
-    RecipeIngredient.findOne
-  );
+  // Delete a Customer with id
+  router.delete("/customers/:id",Customer.delete);
 
-  // Update a Recipe Ingredient with id
-  router.put(
-    "/recipes/:recipeId/recipeIngredients/:id",
-    [authenticateRoute],
-    RecipeIngredient.update
-  );
+  // Delete all customers
+  router.delete("/customers/", Customer.deleteAll);
 
-  // Delete a Recipe Ingredient with id
-  router.delete(
-    "/recipes/:recipeId/recipeIngredients/:id",
-    [authenticateRoute],
-    RecipeIngredient.delete
-  );
-
-  // Delete all Recipe Ingredients
-  router.delete(
-    "/recipeIngredients/",
-    [authenticateRoute],
-    RecipeIngredient.deleteAll
-  );
-
-  app.use("/courierapi", router);
+  app.use(router);
 };

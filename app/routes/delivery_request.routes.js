@@ -1,46 +1,49 @@
 module.exports = (app) => {
-  const RecipeStep = require("../controllers/recipeStep.controller.js");
-  const { authenticateRoute } = require("../authentication/authentication");
+  const DeliveryRequest = require("../controllers/delivery_request.controller.js");
   var router = require("express").Router();
 
-  // Create a new Recipe Step for a Recipe
-  router.post(
-    "/recipes/:recipeId/recipeSteps/",
-    [authenticateRoute],
-    RecipeStep.create
-  );
+  // Create a new DeliveryRequest
+  router.post("/deliveryrequests/",  DeliveryRequest.create);
 
-  // Retrieve all Recipe Steps
-  router.get("/recipeSteps/", RecipeStep.findAll);
+  // Retrieve all deliveryrequests placed by user
+  // router.get(
+  //   "/deliveryrequests/user/:userId",
+  //   Courier.findAllForUser
+  // );
 
-  // Retrieve all Recipe Steps for a Recipe
-  router.get("/recipes/:recipeId/recipeSteps/", RecipeStep.findAllForRecipe);
+  // // Retrieve all deliveryrequests for company
+  // router.get(
+  //   "/deliveryrequests/company/:companyId",
+  //   Courier.findAllForCompany
+  // );
 
-  // Retrieve all Recipe Steps for a Recipe and include the ingredients
-  router.get(
-    "/recipes/:recipeId/recipeStepsWithIngredients/",
-    RecipeStep.findAllForRecipeWithIngredients
-  );
+  // // Retrieve all deliveryrequests for customer
+  // router.get(
+  // "/deliveryrequests/customer/:customerId",
+  // Courier.findAllForCustomer
+  // );
 
-  // Retrieve a single Recipe Step with id
-  router.get("/recipes/:recipeId/recipeSteps/:id", RecipeStep.findOne);
+  // // Retrieve all deliveryrequests assigned to courier
+  //   router.get(
+  //   "/deliveryrequests/courier/:courierId",
+  //   Courier.findAllForCourier
+  // );
+  
+  // Retrieve all deliveryrequests
+  router.get("/deliveryrequests/", DeliveryRequest.findAll);
 
-  // Update a Recipe Step with id
-  router.put(
-    "/recipes/:recipeId/recipeSteps/:id",
-    [authenticateRoute],
-    RecipeStep.update
-  );
+  // Retrieve a single DeliveryRequest with id
+  router.get("/deliveryrequests/:id", DeliveryRequest.findOne);
 
-  // Delete a Recipe Step with id
-  router.delete(
-    "/recipes/:recipeId/recipeSteps/:id",
-    [authenticateRoute],
-    RecipeStep.delete
-  );
+  // Update a DeliveryRequest with id
+  router.put("/deliveryrequests/:id", DeliveryRequest.update);
 
-  // Delete all Recipe Steps
-  router.delete("/recipeSteps/", [authenticateRoute], RecipeStep.deleteAll);
+  // Delete a DeliveryRequest with id
+  router.delete("/deliveryrequests/:id",DeliveryRequest.delete);
 
-  app.use("/courierapi", router);
+  // Delete all deliveryrequests
+  router.delete("/deliveryrequests/", DeliveryRequest.deleteAll);
+
+  app.use(router);
 };
+

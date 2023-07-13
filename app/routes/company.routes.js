@@ -1,25 +1,25 @@
 module.exports = (app) => {
-  const Ingredient = require("../controllers/ingredient.controller.js");
+  const Company = require("../controllers/company.controller.js");
   var router = require("express").Router();
   const { authenticateRoute } = require("../authentication/authentication");
 
-  // Create a new Ingredient
-  router.post("/ingredients/", [authenticateRoute], Ingredient.create);
+  // Create a new Company
+  router.post("/companies/",Company.create);
 
-  // Retrieve all Ingredient
-  router.get("/ingredients/", Ingredient.findAll);
+  // Retrieve all Company
+  router.get("/companies/", Company.findAll);
 
-  // Retrieve a single Ingredient with ingredientId
-  router.get("/ingredients/:id", Ingredient.findOne);
+  // Retrieve a single Company with CompanyId
+  router.get("/companies/:id", Company.findOne);
 
-  // Update an Ingredient with ingredientId
-  router.put("/ingredients/:id", [authenticateRoute], Ingredient.update);
+  // Update an Company with CompanyId
+  router.put("/companies/:id", Company.update);
 
-  // Delete an Ingredient with ingredientId
-  router.delete("/ingredients/:id", [authenticateRoute], Ingredient.delete);
+  // Delete an Company with CompanyId
+  router.delete("/companies/:id", Company.delete);
 
-  // Create a new Ingredient
-  router.delete("/ingredients/", [authenticateRoute], Ingredient.deleteAll);
+  // Delete all
+  router.delete("/companies/", Company.deleteAll);
 
-  app.use("/courierapi", router);
+  app.use(router);
 };
