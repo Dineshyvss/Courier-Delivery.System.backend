@@ -47,51 +47,51 @@ db.user.hasMany(
 );
 
 // foreign key for courier
-db.courier.hasMany(
-  db.company,
+db.company.hasMany(
+  db.courier,
   { as: "company_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
 
 // foreign key for delivery request
-db.delivery_request.hasMany(
-  db.company,
+db.company.hasMany(
+  db.delivery_request,
   { as: "company_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
-db.delivery_request.hasMany(
-  db.user,
+db.user.hasMany(
+  db.delivery_request,
   { as: "placed_by" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
-db.delivery_request.hasMany(
-  db.courier,
+db.courier.hasMany(
+  db.delivery_request,
   { as: "courier_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
 
-db.delivery_request.hasMany(
-  db.customer,
+db.customer.hasMany(
+  db.delivery_request,
   { as: "customer_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
 
-db.company.belongsTo(db.delivery_request, {
+db.delivery_request.belongsTo(db.company, {
   foreignKey: 'company_id',
   as: 'company_details'
 });
 
-db.user.belongsTo(db.delivery_request, {
+db.delivery_request.belongsTo(db.user, {
   foreignKey: 'placed_by',
   as: 'placed_by_details'
 });
 
-db.courier.belongsTo(db.delivery_request, {
+db.delivery_request.belongsTo(db.courier, {
   foreignKey: 'courier_id',
   as: 'courier_details'
 });
 
-db.customer.belongsTo(db.delivery_request, {
+db.delivery_request.belongsTo(db.customer, {
   foreignKey: 'customer_id',
   as: 'customer_details'
 });
