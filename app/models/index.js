@@ -35,46 +35,56 @@ db.session.belongsTo(
 );
 
 // foreign key for user
-db.user.hasMany(
-  db.role,
-  { as: "role_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.user.hasMany(
-  db.company,
-  { as: "company_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-
+db.company.hasMany(db.user, {
+  foreignKey: {
+    name: "company_id", 
+    allowNull: true,
+  },
+});
+db.role.hasMany(db.user, {
+  foreignKey: {
+    name: "role_id", 
+    allowNull: true,
+  },
+});
 // foreign key for courier
-db.company.hasMany(
-  db.courier,
-  { as: "company_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
+db.company.hasMany(db.courier, {
+  foreignKey: {
+    name: "company_id", 
+    allowNull: true,
+  },
+});
 
 // foreign key for delivery request
-db.company.hasMany(
-  db.delivery_request,
-  { as: "company_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.user.hasMany(
-  db.delivery_request,
-  { as: "placed_by" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.courier.hasMany(
-  db.delivery_request,
-  { as: "courier_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
 
-db.customer.hasMany(
-  db.delivery_request,
-  { as: "customer_id" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
+db.company.hasMany(db.delivery_request, {
+  as: "delivery_1",
+  foreignKey: {
+    name: "company_id", 
+    allowNull: true,
+  },
+});
+db.user.hasMany(db.delivery_request, {
+  as: "delivery_2",
+  foreignKey: {
+    name: "placed_by", 
+    allowNull: true,
+  },
+});
+db.courier.hasMany(db.delivery_request, {
+  as: "delivery_3",
+  foreignKey: {
+    name: "courier_id", 
+    allowNull: true,
+  },
+});
+db.customer.hasMany(db.delivery_request, {
+  as: "delivery_4",
+  foreignKey: {
+    name: "customer_id", 
+    allowNull: true,
+  },
+});
 
 db.delivery_request.belongsTo(db.company, {
   foreignKey: 'company_id',
