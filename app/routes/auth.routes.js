@@ -11,5 +11,5 @@ module.exports = (app) => {
   // Log
   router.post("/logout", auth.logout);
 
-  app.use("/courierapi", router);
+  app.use(router);
 };

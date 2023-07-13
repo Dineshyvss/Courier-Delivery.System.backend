@@ -14,16 +14,13 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.ingredient = require("./ingredient.model.js")(sequelize, Sequelize);
-db.recipe = require("./recipe.model.js")(sequelize, Sequelize);
-db.recipeStep = require("./recipeStep.model.js")(sequelize, Sequelize);
-db.recipeIngredient = require("./recipeIngredient.model.js")(
-  sequelize,
-  Sequelize
-);
 db.session = require("./session.model.js")(sequelize, Sequelize);
 db.user = require("./user.model.js")(sequelize, Sequelize);
-db.subscribe = require("./subscribe.model.js")(sequelize, Sequelize);
+db.company = require("./company.model.js")(sequelize, Sequelize);
+db.courier = require("./courier.model.js")(sequelize, Sequelize);
+db.customer = require("./customer.model.js")(sequelize, Sequelize);
+db.role = require("./role.model.js")(sequelize, Sequelize);
+db.delivery_request = require("./delivery_request.model.js")(sequelize, Sequelize);
 
 // foreign key for session
 db.user.hasMany(
@@ -37,60 +34,70 @@ db.session.belongsTo(
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
 
-// foreign key for recipe
+// foreign key for user
 db.user.hasMany(
-  db.recipe,
-  { as: "recipe" },
+  db.role,
+  { as: "role_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
-db.recipe.belongsTo(
+db.user.hasMany(
+  db.company,
+  { as: "company_id" },
+  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
+);
+
+// foreign key for courier
+db.courier.hasMany(
+  db.company,
+  { as: "company_id" },
+  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
+);
+
+// foreign key for delivery request
+db.delivery_request.hasMany(
+  db.company,
+  { as: "company_id" },
+  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
+);
+db.delivery_request.hasMany(
   db.user,
-  { as: "user" },
-  { foreignKey: { allowNull: true }, onDelete: "CASCADE" }
-);
-
-// foreign key for recipeStep
-db.recipe.hasMany(
-  db.recipeStep,
-  { as: "recipeStep" },
+  { as: "placed_by" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
-db.recipeStep.belongsTo(
-  db.recipe,
-  { as: "recipe" },
+db.delivery_request.hasMany(
+  db.courier,
+  { as: "courier_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
 
-// foreign keys for recipeIngredient
-db.recipeStep.hasMany(
-  db.recipeIngredient,
-  { as: "recipeIngredient" },
+db.delivery_request.hasMany(
+  db.customer,
+  { as: "customer_id" },
   { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
 );
-db.recipe.hasMany(
-  db.recipeIngredient,
-  { as: "recipeIngredient" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.ingredient.hasMany(
-  db.recipeIngredient,
-  { as: "recipeIngredient" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.recipeIngredient.belongsTo(
-  db.recipeStep,
-  { as: "recipeStep" },
-  { foreignKey: { allowNull: true }, onDelete: "CASCADE" }
-);
-db.recipeIngredient.belongsTo(
-  db.recipe,
-  { as: "recipe" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
-db.recipeIngredient.belongsTo(
-  db.ingredient,
-  { as: "ingredient" },
-  { foreignKey: { allowNull: false }, onDelete: "CASCADE" }
-);
+
+db.company.belongsTo(db.delivery_request, {
+  foreignKey: 'company_id',
+  as: 'company_details'
+});
+
+db.user.belongsTo(db.delivery_request, {
+  foreignKey: 'placed_by',
+  as: 'placed_by_details'
+});
+
+db.courier.belongsTo(db.delivery_request, {
+  foreignKey: 'courier_id',
+  as: 'courier_details'
+});
+
+db.customer.belongsTo(db.delivery_request, {
+  foreignKey: 'customer_id',
+  as: 'customer_details'
+});
+
+
+
+
 
 module.exports = db;

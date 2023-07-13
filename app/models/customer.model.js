@@ -1,33 +1,23 @@
-const { saltSize, keySize } = require("../authentication/crypto");
-
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("user", {
+  const Customer = sequelize.define("customer", {
     id:{
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    firstName: {
+    name: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    lastName: {
+    contact: {
       type: Sequelize.STRING,
       allowNull: false,
     },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
-    },
-    password: {
-      type: Sequelize.BLOB,
-      allowNull: false,
-    },
-    salt: {
-      type: Sequelize.BLOB,
-      allowNull: false,
-    },
+    }
   });
 
-  return User;
+  return Customer;
 };
