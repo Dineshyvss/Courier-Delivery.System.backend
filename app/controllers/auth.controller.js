@@ -31,7 +31,8 @@ exports.login = async (req, res) => {
         lastName: user.lastName,
         id: user.id,
         token: token,
-        role_id: user.role_id
+        role_id: user.role_id,
+        company_id: user.company_id || 1
       };
       res.send(userInfo);
     });
