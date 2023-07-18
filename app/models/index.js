@@ -21,6 +21,7 @@ db.courier = require("./courier.model.js")(sequelize, Sequelize);
 db.customer = require("./customer.model.js")(sequelize, Sequelize);
 db.role = require("./role.model.js")(sequelize, Sequelize);
 db.delivery_request = require("./delivery_request.model.js")(sequelize, Sequelize);
+db.route = require("./route.model.js")(sequelize, Sequelize);
 
 // foreign key for session
 db.user.hasMany(
