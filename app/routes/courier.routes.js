@@ -7,7 +7,7 @@ module.exports = (app) => {
   router.post("/couriers/",  Courier.create);
 
   // Retrieve all couriers
-  router.get("/courier/", Courier.findAll);
+  router.get("/couriers/", Courier.findAll);
 
   // Retrieve a single Courier with id
   router.get("/couriers/:id", Courier.findOne);
