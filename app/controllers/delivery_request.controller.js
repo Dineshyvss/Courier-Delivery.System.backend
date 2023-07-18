@@ -1,6 +1,11 @@
 const db = require("../models");
 const DeliveryRequest = db.delivery_request;
+const Customer = db.customer;
+const User = db.user;
+const courier = db.courier;
 const Op = db.Sequelize.Op;
+const Sequelize = db.Sequelize;
+const Route = db.route;
 
 // Create and Save a new DeliveryRequest
 exports.create = (req, res) => {
@@ -46,6 +51,42 @@ exports.create = (req, res) => {
     });
 };
 
+exports.findDistance = async(req, res) => {
+  if (req.body.pickup_street === undefined) {
+     const error = new Error("pickup_street cannot be empty for courier!");
+     error.statusCode = 400;
+     throw error;
+   }
+   else if (req.body.pickup_avenue === undefined) {
+     const error = new Error("pickup_avenue cannot be empty for courier!");
+     error.statusCode = 400;
+     throw error;
+   } 
+   else if (req.body.delivery_street === undefined) {
+     const error = new Error("delivery_street cannot be empty for courier!");
+     error.statusCode = 400;
+     throw error;
+   }
+   else if (req.body.delivery_avenue === undefined) {
+     const error = new Error("delivery_avenue cannot be empty for courier!");
+     error.statusCode = 400;
+     throw error;
+   }
+   const distance = await findShortestPath(req.body)
+   if(distance) {
+     res.send({
+       distance: distance,
+       price: "$ "+distance* 10 ,
+       average_time: distance*1.5+" Minutes",
+     });
+   }
+   else {
+     res.status(500).send({
+       message: "Error in calculating the distance",
+     });
+   }
+ };
+
 // Retrieve all DeliveryRequests from the database.
 exports.findAll = (req, res) => {
   const deliveryRequestId = req.query.deliveryRequestId;
@@ -57,7 +98,7 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]] })
+  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -69,11 +110,79 @@ exports.findAll = (req, res) => {
     });
 };
 
+exports.findAllForUser = (req,res) => {
+  var condition = {
+    placed_by: req.params.userId,
+  }
+
+  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving delivery_requests.",
+      });
+    });
+}
+
+exports.findAllForCustomer = (req,res) => {
+  var condition = {
+    customer_id: req.params.customerId,
+  }
+
+  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving delivery_requests.",
+      });
+    });
+}
+
+exports.findAllForCourier = (req,res) => {
+  var condition = {
+    courier_id: req.params.courierId,
+  }
+
+  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving delivery_requests.",
+      });
+    });
+}
+
+exports.findAllForCompany = (req,res) => {
+  var condition = {
+    company_id: req.params.companyId,
+  }
+
+  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving delivery_requests.",
+      });
+    });
+}
+
 // Find a single DeliveryRequest with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  DeliveryRequest.findByPk(id)
+  DeliveryRequest.findByPk(id,{ include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}]})
     .then((data) => {
       res.send(data);
     })
@@ -87,7 +196,6 @@ exports.findOne = (req, res) => {
 // Update a DeliveryRequest by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
-
   DeliveryRequest.update(req.body, {
     where: { id: id },
   })
@@ -150,3 +258,119 @@ exports.deleteAll = (req, res) => {
       });
     });
 };
+
+exports.pickedup  = async(req, res) => {
+  try{
+  const id = req.params.id;
+  const courier = await Courier.findByPk(id)
+  Courier.update({pickedup_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"progress"}, {
+    where: { id: id },
+  })
+    .then((response) => {
+      if (response == 1) {
+        res.send({
+          message: "courier was updated successfully.",
+        });
+      } else {
+        res.send({
+          message: `Cannot update courier with id=${id}. Maybe courier was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Error updating courier with id=" + id,
+      });
+    });
+  }
+  catch(e) {
+    res.status(500).send({
+      message: e.message || "Error updating courier with id=" + id,
+    });
+  }
+};
+
+exports.checkDeliveredInTime = (pickedup_date_time, current_time, minimum_time) => {
+  const pickedupTime = new Date(pickedup_date_time);
+  const timeDifference = current_time - pickedupTime;
+  const minutesDifference = Math.floor(timeDifference / 1000 / 60);
+
+  return minutesDifference <= minimum_time;
+}
+
+exports.delivered  = async(req, res) => {
+  try {
+  const id = req.params.id;
+  const courier  = await Courier.findByPk(id)
+  const deliveredInTime = checkDeliveredInTime(courier.pickedup_date_time,new Date(),courier.average_time)
+
+  Courier.update({ delivered_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"DELIVERED",deliveredInTime: deliveredInTime , courier_bonus: deliveredInTime ? 10 : 0 }, {
+    where: { id: id },
+  })
+    .then((response) => {
+      if (response == 1) {
+        res.send({
+          message: "courier was updated successfully.",
+        });
+      } else {
+        res.send({
+          message: `Cannot update courier with id=${id}. Maybe courier was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Error updating courier with id=" + id,
+      });
+    });
+  }
+  catch(e) {
+    res.status(500).send({
+      message: e.message || "Error updating courier with id=" + id,
+    });
+  }
+};
+
+// Dijkstra's algorithm
+async function findShortestPath(body) {
+  const { pickup_street,pickup_avenue,delivery_street,delivery_avenue} = body
+  const pickup = pickup_street+pickup_avenue
+  const delivery = delivery_street+delivery_avenue
+  const locations = await Route.findAll();
+  const graphForLocations = {};
+  locations.forEach((entry) => {
+    const { source, destination } = entry;
+    if (!graphForLocations[source]) {
+      graphForLocations[source] = {};
+    }
+    graphForLocations[source][destination] = 1;
+  });
+  const distances = {};
+  const visited = {};
+  Object.keys(graphForLocations).forEach((vertex) => {
+    distances[vertex] = Infinity;
+  });
+  distances[pickup] = 0;
+  while (true) {
+    let closestVertex = null;
+    let closestDistance = Infinity;
+    Object.keys(graphForLocations).forEach((vertex) => {
+      if (!visited[vertex] && distances[vertex] < closestDistance) {
+        closestVertex = vertex;
+        closestDistance = distances[vertex];
+      }
+    });
+    if (closestVertex === null) {
+      break;
+    }
+    visited[closestVertex] = true;
+    Object.keys(graphForLocations[closestVertex]).forEach((neighbor) => {
+      const distance = closestDistance + graphForLocations[closestVertex][neighbor];
+      if (distance < distances[neighbor]) {
+        distances[neighbor] = distance;
+      }
+    });
+  }
+  return distances[delivery];
+}
+

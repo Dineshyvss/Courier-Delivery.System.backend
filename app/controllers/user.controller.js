@@ -50,7 +50,8 @@ exports.create = async (req, res) => {
           email: req.body.email,
           password: hash,
           salt: salt,
-          role_id: req.body.role_id
+          role_id: req.body.role_id,
+          company_id: req.body.company_id || 1
         };
 
         // Save User in the database
@@ -76,7 +77,8 @@ exports.create = async (req, res) => {
                 lastName: user.lastName,
                 id: user.id,
                 token: token,
-                role_id: user.role_id
+                role_id: user.role_id,
+                company_id: user.company_id || 1
               };
               res.send(userInfo);
             });
