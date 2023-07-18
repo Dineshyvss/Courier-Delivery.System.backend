@@ -4,30 +4,31 @@ module.exports = (app) => {
 
   // Create a new DeliveryRequest
   router.post("/deliveryrequests/",  DeliveryRequest.create);
+  router.post("/deliveryrequests/estimateCost",  DeliveryRequest.findDistance);
 
   // Retrieve all deliveryrequests placed by user
-  // router.get(
-  //   "/deliveryrequests/user/:userId",
-  //   Courier.findAllForUser
-  // );
+  router.get(
+    "/deliveryrequests/user/:userId",
+    DeliveryRequest.findAllForUser
+  );
 
-  // // Retrieve all deliveryrequests for company
-  // router.get(
-  //   "/deliveryrequests/company/:companyId",
-  //   Courier.findAllForCompany
-  // );
+  // Retrieve all deliveryrequests for company
+  router.get(
+    "/deliveryrequests/company/:companyId",
+    DeliveryRequest.findAllForCompany
+  );
 
-  // // Retrieve all deliveryrequests for customer
-  // router.get(
-  // "/deliveryrequests/customer/:customerId",
-  // Courier.findAllForCustomer
-  // );
+  // Retrieve all deliveryrequests for customer
+  router.get(
+  "/deliveryrequests/customer/:customerId",
+  DeliveryRequest.findAllForCustomer
+  );
 
-  // // Retrieve all deliveryrequests assigned to courier
-  //   router.get(
-  //   "/deliveryrequests/courier/:courierId",
-  //   Courier.findAllForCourier
-  // );
+  // Retrieve all deliveryrequests assigned to courier
+    router.get(
+    "/deliveryrequests/courier/:courierId",
+    DeliveryRequest.findAllForCourier
+  );
   
   // Retrieve all deliveryrequests
   router.get("/deliveryrequests/", DeliveryRequest.findAll);
