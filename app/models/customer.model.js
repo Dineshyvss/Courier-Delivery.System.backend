@@ -16,7 +16,16 @@ module.exports = (sequelize, Sequelize) => {
     email: {
       type: Sequelize.STRING,
       allowNull: false,
-    }
+    },
+    street: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    avenue: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+
   });
 
   return Customer;

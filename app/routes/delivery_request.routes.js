@@ -5,7 +5,8 @@ module.exports = (app) => {
   // Create a new DeliveryRequest
   router.post("/deliveryrequests/",  DeliveryRequest.create);
   router.post("/deliveryrequests/estimateCost",  DeliveryRequest.findDistance);
-
+  router.post("/deliveryrequests/pickitup/:id", DeliveryRequest.pickedup);
+  router.post("/deliveryrequests/delivered/:id", DeliveryRequest.delivered);
   // Retrieve all deliveryrequests placed by user
   router.get(
     "/deliveryrequests/user/:userId",
@@ -47,4 +48,3 @@ module.exports = (app) => {
 
   app.use(router);
 };
-
