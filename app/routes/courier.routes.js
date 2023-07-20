@@ -1,6 +1,5 @@
 module.exports = (app) => {
-  const Courier = require("../controllers/courier.controller.js");
-  const { authenticateRoute } = require("../authentication/authentication");
+  const Courier = require("../controllers/user.controller.js");
   var router = require("express").Router();
 
   // Create a new Courier

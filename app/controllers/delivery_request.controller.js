@@ -2,10 +2,10 @@ const db = require("../models");
 const DeliveryRequest = db.delivery_request;
 const Customer = db.customer;
 const User = db.user;
-const courier = db.courier;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
 const Route = db.route;
+const nodemailer = require('nodemailer');
 
 // Create and Save a new DeliveryRequest
 exports.create = (req, res) => {
@@ -42,6 +42,7 @@ exports.create = (req, res) => {
   DeliveryRequest.create(req.body)
     .then((data) => {
       res.send(data);
+      // sendEmail(data,"Your User created just now!")
     })
     .catch((err) => {
       res.status(500).send({
@@ -53,26 +54,27 @@ exports.create = (req, res) => {
 
 exports.findDistance = async(req, res) => {
   if (req.body.pickup_street === undefined) {
-     const error = new Error("pickup_street cannot be empty for courier!");
+     const error = new Error("pickup_street cannot be empty for delivery_request!");
      error.statusCode = 400;
      throw error;
    }
    else if (req.body.pickup_avenue === undefined) {
-     const error = new Error("pickup_avenue cannot be empty for courier!");
+     const error = new Error("pickup_avenue cannot be empty for delivery_request!");
      error.statusCode = 400;
      throw error;
    } 
    else if (req.body.delivery_street === undefined) {
-     const error = new Error("delivery_street cannot be empty for courier!");
+     const error = new Error("delivery_street cannot be empty for delivery_request!");
      error.statusCode = 400;
      throw error;
    }
    else if (req.body.delivery_avenue === undefined) {
-     const error = new Error("delivery_avenue cannot be empty for courier!");
+     const error = new Error("delivery_avenue cannot be empty for delivery_request!");
      error.statusCode = 400;
      throw error;
    }
    const distance = await findShortestPath(req.body)
+   console.log("dis",distance)
    if(distance) {
      res.send({
        distance: distance,
@@ -98,7 +100,7 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -115,7 +117,7 @@ exports.findAllForUser = (req,res) => {
     placed_by: req.params.userId,
   }
 
-  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -132,7 +134,7 @@ exports.findAllForCustomer = (req,res) => {
     customer_id: req.params.customerId,
   }
 
-  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -149,7 +151,7 @@ exports.findAllForCourier = (req,res) => {
     courier_id: req.params.courierId,
   }
 
-  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -166,7 +168,7 @@ exports.findAllForCompany = (req,res) => {
     company_id: req.params.companyId,
   }
 
-  DeliveryRequest.findAll({ where: condition, courier: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}] })
+  DeliveryRequest.findAll({ where: condition, order: [["id", "DESC"]], include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}] })
     .then((data) => {
       res.send(data);
     })
@@ -182,7 +184,7 @@ exports.findAllForCompany = (req,res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  DeliveryRequest.findByPk(id,{ include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: courier, as:'courier_details'}]})
+  DeliveryRequest.findByPk(id,{ include: [  { model: Customer, as: 'customer_details' },{ model: User, as: 'placed_by_details' },{ model: User, as:'courier_details'}]})
     .then((data) => {
       res.send(data);
     })
@@ -262,71 +264,73 @@ exports.deleteAll = (req, res) => {
 exports.pickedup  = async(req, res) => {
   try{
   const id = req.params.id;
-  const courier = await Courier.findByPk(id)
-  Courier.update({pickedup_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"progress"}, {
+  const deliveryRequest = await DeliveryRequest.findByPk(id)
+  DeliveryRequest.update({pickedup_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"progress"}, {
     where: { id: id },
   })
     .then((response) => {
       if (response == 1) {
         res.send({
-          message: "courier was updated successfully.",
+          message: "delivery request was updated successfully.",
         });
+        // sendEmail(deliveryRequest,"Your User is picked up by courier boy. It will reach the destination in "+deliveryRequest.average_time+" Minutes.")
       } else {
-        res.send({
-          message: `Cannot update courier with id=${id}. Maybe courier was not found or req.body is empty!`,
+        res.status(500).send({
+          message: `Cannot update delivery request with id=${id}. Maybe delivery request was not found or req.body is empty!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Error updating courier with id=" + id,
+        message: err.message || "Error updating delivery request with id=" + id,
       });
     });
   }
   catch(e) {
     res.status(500).send({
-      message: e.message || "Error updating courier with id=" + id,
+      message: e.message || "Error updating delivery request with id=" + id,
     });
   }
 };
 
-exports.checkDeliveredInTime = (pickedup_date_time, current_time, minimum_time) => {
+function isDeliveredInTime(pickedup_date_time, current_time, average_time) {
   const pickedupTime = new Date(pickedup_date_time);
   const timeDifference = current_time - pickedupTime;
   const minutesDifference = Math.floor(timeDifference / 1000 / 60);
 
-  return minutesDifference <= minimum_time;
+  return minutesDifference <= average_time;
 }
 
 exports.delivered  = async(req, res) => {
   try {
   const id = req.params.id;
-  const courier  = await Courier.findByPk(id)
-  const deliveredInTime = checkDeliveredInTime(courier.pickedup_date_time,new Date(),courier.average_time)
+  const deliveryRequest  = await DeliveryRequest.findByPk(id)
+  const deliveredInTime = isDeliveredInTime(deliveryRequest.pickedup_date_time,new Date(),deliveryRequest.average_time)
 
-  Courier.update({ delivered_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"DELIVERED",deliveredInTime: deliveredInTime , courier_bonus: deliveredInTime ? 10 : 0 }, {
+  DeliveryRequest.update({ delivered_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"DELIVERED",deliveredInTime: deliveredInTime , courier_bonus: deliveredInTime ? 10 : 0 }, {
     where: { id: id },
   })
     .then((response) => {
       if (response == 1) {
         res.send({
-          message: "courier was updated successfully.",
+          message: "delivery request was updated successfully.",
         });
+        // sendEmail(deliveryRequest,"Your User is Delivered!")
       } else {
-        res.send({
-          message: `Cannot update courier with id=${id}. Maybe courier was not found or req.body is empty!`,
+        res.status(500).send({
+          message: `Cannot update delivery request with id=${id}. Maybe delivery request was not found or req.body is empty!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || "Error updating courier with id=" + id,
+        message: err.message || "Error updating delivery request with id=" + id,
       });
     });
   }
   catch(e) {
     res.status(500).send({
-      message: e.message || "Error updating courier with id=" + id,
+      message: e.message || "Error updating delivery request with id=" + id,
     });
   }
 };
@@ -334,8 +338,8 @@ exports.delivered  = async(req, res) => {
 // Dijkstra's algorithm
 async function findShortestPath(body) {
   const { pickup_street,pickup_avenue,delivery_street,delivery_avenue} = body
-  const pickup = pickup_street+pickup_avenue
-  const delivery = delivery_street+delivery_avenue
+  const pickup = pickup_avenue+pickup_street
+  const delivery = delivery_avenue+delivery_street
   const locations = await Route.findAll();
   const graphForLocations = {};
   locations.forEach((entry) => {
@@ -371,6 +375,7 @@ async function findShortestPath(body) {
       }
     });
   }
+  console.log("dis1",distances)
   return distances[delivery];
 }
 

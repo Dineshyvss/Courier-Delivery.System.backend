@@ -17,7 +17,6 @@ db.sequelize = sequelize;
 db.session = require("./session.model.js")(sequelize, Sequelize);
 db.user = require("./user.model.js")(sequelize, Sequelize);
 db.company = require("./company.model.js")(sequelize, Sequelize);
-db.courier = require("./courier.model.js")(sequelize, Sequelize);
 db.customer = require("./customer.model.js")(sequelize, Sequelize);
 db.role = require("./role.model.js")(sequelize, Sequelize);
 db.delivery_request = require("./delivery_request.model.js")(sequelize, Sequelize);
@@ -41,19 +40,14 @@ db.company.hasMany(db.user, {
     name: "company_id", 
     allowNull: true,
   },
+  onDelete: 'CASCADE',
 });
 db.role.hasMany(db.user, {
   foreignKey: {
     name: "role_id", 
     allowNull: true,
   },
-});
-// foreign key for courier
-db.company.hasMany(db.courier, {
-  foreignKey: {
-    name: "company_id", 
-    allowNull: true,
-  },
+  onDelete: 'CASCADE',
 });
 
 // foreign key for delivery request
@@ -64,6 +58,7 @@ db.company.hasMany(db.delivery_request, {
     name: "company_id", 
     allowNull: true,
   },
+  onDelete: 'CASCADE',
 });
 db.user.hasMany(db.delivery_request, {
   as: "delivery_2",
@@ -71,13 +66,15 @@ db.user.hasMany(db.delivery_request, {
     name: "placed_by", 
     allowNull: true,
   },
+  onDelete: 'CASCADE',
 });
-db.courier.hasMany(db.delivery_request, {
+db.user.hasMany(db.delivery_request, {
   as: "delivery_3",
   foreignKey: {
     name: "courier_id", 
     allowNull: true,
   },
+  onDelete: 'CASCADE',
 });
 db.customer.hasMany(db.delivery_request, {
   as: "delivery_4",
@@ -85,6 +82,7 @@ db.customer.hasMany(db.delivery_request, {
     name: "customer_id", 
     allowNull: true,
   },
+  onDelete: 'CASCADE',
 });
 
 db.delivery_request.belongsTo(db.company, {
@@ -97,7 +95,7 @@ db.delivery_request.belongsTo(db.user, {
   as: 'placed_by_details'
 });
 
-db.delivery_request.belongsTo(db.courier, {
+db.delivery_request.belongsTo(db.user, {
   foreignKey: 'courier_id',
   as: 'courier_details'
 });
@@ -106,9 +104,5 @@ db.delivery_request.belongsTo(db.customer, {
   foreignKey: 'customer_id',
   as: 'customer_details'
 });
-
-
-
-
 
 module.exports = db;
