@@ -265,7 +265,7 @@ exports.pickedup  = async(req, res) => {
   try{
   const id = req.params.id;
   const deliveryRequest = await DeliveryRequest.findByPk(id)
-  DeliveryRequest.update({pickedup_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"progress"}, {
+  DeliveryRequest.update({pickedup_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),delivery_status:"progress"}, {
     where: { id: id },
   })
     .then((response) => {
@@ -307,7 +307,7 @@ exports.delivered  = async(req, res) => {
   const deliveryRequest  = await DeliveryRequest.findByPk(id)
   const deliveredInTime = isDeliveredInTime(deliveryRequest.pickedup_date_time,new Date(),deliveryRequest.average_time)
 
-  DeliveryRequest.update({ delivered_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),status:"DELIVERED",deliveredInTime: deliveredInTime , courier_bonus: deliveredInTime ? 10 : 0 }, {
+  DeliveryRequest.update({ delivered_date_time: Sequelize.literal('CURRENT_TIMESTAMP'),delivery_status:"DELIVERED",deliveredInTime: deliveredInTime , courier_bonus: deliveredInTime ? 10 : 0 }, {
     where: { id: id },
   })
     .then((response) => {
