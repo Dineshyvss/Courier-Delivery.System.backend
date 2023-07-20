@@ -6,7 +6,7 @@ const cors = require("cors");
 const Route = db.route;
 const sequelize = db.sequelize;
 const app = express();
-const PORT = 3200;
+const PORT = 3101;
 
 let corsOptions = {
   origin: "*",
