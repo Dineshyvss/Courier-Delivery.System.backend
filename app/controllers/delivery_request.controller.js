@@ -42,7 +42,7 @@ exports.create = (req, res) => {
   DeliveryRequest.create(req.body)
     .then((data) => {
       res.send(data);
-      // sendEmail(data,"Your User created just now!")
+      sendEmail(data,"You have placed an order for courier successfully!")
     })
     .catch((err) => {
       res.status(500).send({
@@ -273,7 +273,7 @@ exports.pickedup  = async(req, res) => {
         res.send({
           message: "delivery request was updated successfully.",
         });
-        // sendEmail(deliveryRequest,"Your User is picked up by courier boy. It will reach the destination in "+deliveryRequest.average_time+" Minutes.")
+        sendEmail(deliveryRequest,"Your Order is picked up by courier boy. It will reach the destination in "+deliveryRequest.average_time)
       } else {
         res.status(500).send({
           message: `Cannot update delivery request with id=${id}. Maybe delivery request was not found or req.body is empty!`,
@@ -315,7 +315,7 @@ exports.delivered  = async(req, res) => {
         res.send({
           message: "delivery request was updated successfully.",
         });
-        // sendEmail(deliveryRequest,"Your User is Delivered!")
+        sendEmail(deliveryRequest,"Your Order is Delivered!")
       } else {
         res.status(500).send({
           message: `Cannot update delivery request with id=${id}. Maybe delivery request was not found or req.body is empty!`,
@@ -334,6 +334,36 @@ exports.delivered  = async(req, res) => {
     });
   }
 };
+
+async function sendEmail(data,text){
+  const customer = await Customer.findByPk(data.customer_id);
+ // Create a transporter object
+ const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'S.rayavaram@eagles.oc.edu',
+    pass: 'oezxsfacdrpdljgt'
+  }
+});
+
+// Define the email options
+const mailOptions = {
+  from: 'S.rayavaram@eagles.oc.edu',
+  to: customer.email,
+  subject:"ACME COURIERS",
+  text: "Hi "+customer.name+","+ text,
+};
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.log('Error sending email:', error);
+  } else {
+    console.log('Email sent successfully:', info.response);
+  }
+});
+
+}
 
 // Dijkstra's algorithm
 async function findShortestPath(body) {
