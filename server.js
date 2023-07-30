@@ -35,6 +35,8 @@ require("./app/routes/courier.routes")(app);
 require("./app/routes/customer.routes")(app);
 require("./app/routes/delivery_request.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/dashboard.routes")(app);
+
 
 const graph = {
   '1A': { '2A': 1},
